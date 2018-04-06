@@ -1,8 +1,12 @@
-group 'at.technikum.mse.swf'
-version '1.0-SNAPSHOT'
+plugins {
+  id "org.sonarqube" version "2.6"
+}
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
+
+group 'at.technikum.mse.swf'
+version '1.0-SNAPSHOT'
 
 sourceCompatibility = 1.8
 
