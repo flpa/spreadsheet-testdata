@@ -1,4 +1,6 @@
-package at.technikum.mse.est;
+package at.technikum.mse.est.poc;
+
+import at.technikum.mse.est.Label;
 
 public class TestClass {
     @Label("TestStringLabel")

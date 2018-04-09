@@ -1,4 +1,4 @@
-package at.technikum.mse.est;
+package at.technikum.mse.est.poc;
 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddressList;
@@ -49,29 +49,7 @@ public class PoiExample {
 
         // Char --------------------------------------------------------------------------------------------------------
         // style for column
-        style = workbook.createCellStyle();
-        style.setDataFormat((short)0x31);
-        sheet.setDefaultColumnStyle(colNumber, style);
-
-        // header
-        cell = row.createCell(colNumber);
-        cell.setCellStyle(headerStyle);
-        cell.setCellValue("Char");
-
-        // validation
-        constraint = validationHelper.createTextLengthConstraint(DataValidationConstraint.OperatorType.BETWEEN, "1", "1");
-        addressList = new CellRangeAddressList(1, MAX_EXCEL_ROW, colNumber, colNumber);
-        validation = validationHelper.createValidation(constraint, addressList);
-
-        validation.createPromptBox("Only char values allowed", "Length: 1");
-        validation.setShowPromptBox(true);
-
-        validation.setErrorStyle(DataValidation.ErrorStyle.STOP);
-        validation.createErrorBox("Only char values allowed", "Only char values are allowed!");
-        validation.setShowErrorBox(true);
-
-        sheet.addValidationData(validation);
-        colNumber++;
+        colNumber = a(workbook, sheet, validationHelper, row, colNumber, headerStyle);
 
 
         // Short -------------------------------------------------------------------------------------------------------
@@ -243,4 +221,37 @@ public class PoiExample {
             e.printStackTrace();
         }
     }
+
+	private static int a(XSSFWorkbook workbook, XSSFSheet sheet, XSSFDataValidationHelper validationHelper, Row row,
+			int colNumber, XSSFCellStyle headerStyle) {
+		Cell cell;
+		XSSFCellStyle style;
+		DataValidationConstraint constraint;
+		CellRangeAddressList addressList;
+		DataValidation validation;
+		style = workbook.createCellStyle();
+        style.setDataFormat((short)0x31);
+        sheet.setDefaultColumnStyle(colNumber, style);
+
+        // header
+        cell = row.createCell(colNumber);
+        cell.setCellStyle(headerStyle);
+        cell.setCellValue("Char");
+
+        // validation
+        constraint = validationHelper.createTextLengthConstraint(DataValidationConstraint.OperatorType.BETWEEN, "1", "1");
+        addressList = new CellRangeAddressList(1, MAX_EXCEL_ROW, colNumber, colNumber);
+        validation = validationHelper.createValidation(constraint, addressList);
+
+        validation.createPromptBox("Only char values allowed", "Length: 1");
+        validation.setShowPromptBox(true);
+
+        validation.setErrorStyle(DataValidation.ErrorStyle.STOP);
+        validation.createErrorBox("Only char values allowed", "Only char values are allowed!");
+        validation.setShowErrorBox(true);
+
+        sheet.addValidationData(validation);
+        colNumber++;
+		return colNumber;
+	}
 }
