@@ -7,7 +7,7 @@ import org.apache.poi.ss.usermodel.DataValidationConstraint;
 import org.apache.poi.ss.usermodel.DataValidationHelper;
 import org.apache.poi.ss.util.CellRangeAddressList;
 
-public class PoiIntegerTypeMapper implements TypeMapper<Integer, PoiContext> {
+public class PoiLongTypeMapper implements TypeMapper<Long, PoiContext> {
 
 	@Override
 	public void createColumn(PoiContext context, int index) {
@@ -18,22 +18,22 @@ public class PoiIntegerTypeMapper implements TypeMapper<Integer, PoiContext> {
 
 		// validation
 		DataValidationHelper validationHelper = context.getSheet().getDataValidationHelper();
-		DataValidationConstraint constraint = validationHelper.createIntegerConstraint(DataValidationConstraint.OperatorType.BETWEEN, Integer.toString(Integer.MIN_VALUE), Integer.toString(Integer.MAX_VALUE));
+		DataValidationConstraint constraint = validationHelper.createIntegerConstraint(DataValidationConstraint.OperatorType.BETWEEN, Long.toString(Long.MIN_VALUE), Long.toString(Long.MAX_VALUE));
 		CellRangeAddressList addressList = new CellRangeAddressList(1, PoiConstants.EXCEL_MAX_ROW, index, index);
 		DataValidation validation = validationHelper.createValidation(constraint, addressList);
 
-		validation.createPromptBox("Integer", "Only integer values allowed");
+		validation.createPromptBox("Long", "Only long values allowed");
 		validation.setShowPromptBox(true);
 
 		validation.setErrorStyle(DataValidation.ErrorStyle.STOP);
-		validation.createErrorBox("Only integer values allowed", "Only integer values are allowed!\nRange: " + Integer.MIN_VALUE + " to " + Integer.MAX_VALUE);
+		validation.createErrorBox("Only long values allowed", "Only long values are allowed!\nRange: " + Long.MIN_VALUE + " to " + Long.MAX_VALUE);
 		validation.setShowErrorBox(true);
 
 		context.getSheet().addValidationData(validation);
 	}
 
 	@Override
-	public Integer readValue(PoiContext context, int row, int column) {
+	public Long readValue(PoiContext context, int row, int column) {
 		// TODO Auto-generated method stub
 		return null;
 	}
