@@ -1,8 +1,5 @@
 package dtos;
 
-import java.time.LocalDate;
-import java.util.Date;
-
 import at.technikum.mse.est.Label;
 
 public class Student {
@@ -11,13 +8,10 @@ public class Student {
 	private String name;
 	
 	@Label("Id")
-	private Double id;
+	private Integer id;
 	
 	@Label("Address")
 	private String address;
-//	
-//	@Label("Date Of Birth")
-//	private LocalDate dateOfBirth;
 
 	public String getName() {
 		return name;
@@ -27,11 +21,11 @@ public class Student {
 		this.name = name;
 	}
 
-	public Double getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(Double id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
@@ -43,19 +37,15 @@ public class Student {
 		this.address = address;
 	}
 
-//	public LocalDate getDateOfBirth() {
-//		return dateOfBirth;
-//	}
-//
-//	public void setDateOfBirth(LocalDate dateOfBirth) {
-//		this.dateOfBirth = dateOfBirth;
-//	}
-
-	public Student(String name, Double id, String address) {
+	public Student(String name, Integer id, String address) {
 		this.name = name;
 		this.id = id;
 		this.address = address;
-//		this.dateOfBirth = dateOfBirth;
+	}
+
+	@Override
+	public String toString() {
+		return "Student [name=" + name + ", id=" + id + ", address=" + address + "]";
 	}
 	
 	

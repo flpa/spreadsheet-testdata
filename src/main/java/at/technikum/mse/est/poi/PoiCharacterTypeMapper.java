@@ -1,6 +1,8 @@
 package at.technikum.mse.est.poi;
 
 import at.technikum.mse.est.TypeMapper;
+
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.DataValidation;
 import org.apache.poi.ss.usermodel.DataValidationConstraint;
@@ -34,7 +36,11 @@ public class PoiCharacterTypeMapper implements TypeMapper<Character, PoiContext>
 
 	@Override
 	public Character readValue(PoiContext context, int row, int column) {
-		// TODO Auto-generated method stub
+		Cell cell = context.getSheet().getRow(row).getCell(column);
+		String value = cell.getStringCellValue();
+		if(value.length()==1) {
+			return value.charAt(0);
+		}
 		return null;
 	}
 

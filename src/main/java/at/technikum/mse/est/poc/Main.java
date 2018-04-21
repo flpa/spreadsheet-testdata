@@ -1,9 +1,14 @@
 package at.technikum.mse.est.poc;
 
+import java.io.File;
+import java.util.List;
+
 import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.technikum.mse.est.FileMapper;
+import at.technikum.mse.est.poi.PoiFileMapper;
 import dtos.Student;
 
 public class Main {
@@ -12,8 +17,11 @@ public class Main {
 	public static void main(String[] args) throws Exception {
 		LOG.info("Starting");
 		
-		Reader reader = new ExcelReader();
-		Workbook wb = reader.createWorkbook("resources/Students.xlsx");
-		reader.mapSheetToClass(wb, 0, Student.class);
+		FileMapper fileMapper = new PoiFileMapper();
+        List<Student> list = fileMapper.read(new File("resources/Students.xlsx"), Student.class, 0);
+        
+        for(Student student : list) {
+        	System.out.println(student.toString());
+        }
 	}
 }

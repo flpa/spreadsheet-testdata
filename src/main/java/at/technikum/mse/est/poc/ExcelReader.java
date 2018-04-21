@@ -35,7 +35,7 @@ public class ExcelReader implements Reader {
         for (int r = 1; r < sheet.getPhysicalNumberOfRows(); r++) {
             Row currentRow = sheet.getRow(r);
             for (int i = 0; i < c.getDeclaredFields().length; i++) {
-                Cell cell = currentRow.getCell(hashMap.get(new FieldLabelBuilder().build(fields[i])));
+            	Cell cell = currentRow.getCell(hashMap.get(new FieldLabelBuilder().build(fields[i])));
                 if (cell.getCellTypeEnum().equals(CellType.STRING)) {
                     args[i] = cell.getStringCellValue();
                 }

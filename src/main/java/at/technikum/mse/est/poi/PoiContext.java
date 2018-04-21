@@ -15,12 +15,10 @@ public class PoiContext implements Context {
 	private final Sheet sheet;
 	// flpa: not sure if this needs to be here?
 	// private final XSSFDataValidationHelper validationHelper;
-	private final Row row;
 
-	public PoiContext(Workbook workbook, Sheet sheet, Row row) {
+	public PoiContext(Workbook workbook, Sheet sheet) {
 		this.workbook = workbook;
 		this.sheet = sheet;
-		this.row = row;
 	}
 
 	public Workbook getWorkbook() {
@@ -31,7 +29,5 @@ public class PoiContext implements Context {
 		return sheet;
 	}
 
-	public Row getRow() {
-		return row;
-	}
+	
 }

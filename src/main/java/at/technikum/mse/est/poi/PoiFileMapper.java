@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 public class PoiFileMapper implements FileMapper {
@@ -41,7 +42,7 @@ public class PoiFileMapper implements FileMapper {
         headerStyle.setDataFormat(PoiConstants.EXCEL_CELL_STYLE_DATA_FORMAT_TEXT);
         sheet.createFreezePane(0, 1);
 
-        Context poiContext = new PoiContext(workbook, sheet, row);
+        Context poiContext = new PoiContext(workbook, sheet);
 
         Field[] fields = clazz.getDeclaredFields();
         FieldLabelBuilder fieldLabelBuilder = new FieldLabelBuilder();
@@ -69,14 +70,54 @@ public class PoiFileMapper implements FileMapper {
 	}
 
 	@Override
-	public <T> List<T> read(File source, Class<T> clazz) {
-		// TODO Auto-generated method stub
-		return Collections.emptyList();
+	public <T> List<T> read(File source, Class<T> clazz, int sheetIndex) throws Exception {
+		Workbook workbook = WorkbookFactory.create(source);
+		Sheet sheet = workbook.getSheetAt(sheetIndex);
+        ArrayList<T> objectsList = new ArrayList<>(); 
+        Field[] fields = clazz.getDeclaredFields();
+
+        Object[] args = new Object[fields.length];
+
+        HashMap<String, Integer> hashMap = getExcelFieldNames(sheet);
+
+        for (int row = 1; row < sheet.getPhysicalNumberOfRows(); row++) {
+            for (int i = 0; i < clazz.getDeclaredFields().length; i++) {
+            	int currentColumn = hashMap.get(new FieldLabelBuilder().build(fields[i]));
+            	TypeMapper typeMapper = typeMappers.get(fields[i].getType());
+                args[i] = typeMapper.readValue(new PoiContext(workbook, sheet), row, currentColumn);
+            }
+            objectsList.add(newInstance(clazz.getName(), args));
+        }
+        return objectsList;
 	}
 
     @Override
     public <S> void registerTypeMapper(TypeMapper typeMapper, Class<S> type) {
         this.typeMappers.put(type, typeMapper);
     }
+    
+    public HashMap<String, Integer> getExcelFieldNames(Sheet sheet) {
+
+        HashMap<String, Integer> hashMap = new HashMap<>();
+
+        Row row = sheet.getRow(0);
+        for (int i = 0; i < row.getLastCellNum(); i++) {
+            hashMap.put(row.getCell(i).getStringCellValue(), i);
+        }
+        return hashMap;
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static <T> T newInstance(final String className, final Object... args)
+            throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException,
+            IllegalArgumentException, InvocationTargetException {
+        @SuppressWarnings("rawtypes")
+        Class[] types = new Class[args.length];
+        for (int i = 0; i < types.length; i++) {
+            types[i] = args[i].getClass();
+        }
+        return (T)Class.forName(className).getConstructor(types).newInstance(args);
+    }
+
 
 }

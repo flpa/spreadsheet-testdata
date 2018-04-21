@@ -1,6 +1,8 @@
 package at.technikum.mse.est.poi;
 
 import at.technikum.mse.est.TypeMapper;
+
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.DataValidation;
 import org.apache.poi.ss.usermodel.DataValidationConstraint;
@@ -34,8 +36,8 @@ public class PoiDoubleTypeMapper implements TypeMapper<Double, PoiContext> {
 
 	@Override
 	public Double readValue(PoiContext context, int row, int column) {
-		// TODO Auto-generated method stub
-		return null;
+		Cell cell = context.getSheet().getRow(row).getCell(column);
+		return cell.getNumericCellValue();
 	}
 
 }

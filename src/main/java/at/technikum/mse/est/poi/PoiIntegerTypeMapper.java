@@ -1,5 +1,7 @@
 package at.technikum.mse.est.poi;
 
+import org.apache.poi.ss.usermodel.Cell;
+
 import at.technikum.mse.est.TypeMapper;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.DataValidation;
@@ -34,8 +36,13 @@ public class PoiIntegerTypeMapper implements TypeMapper<Integer, PoiContext> {
 
 	@Override
 	public Integer readValue(PoiContext context, int row, int column) {
-		// TODO Auto-generated method stub
-		return null;
+		Cell cell = context.getSheet().getRow(row).getCell(column);
+		int value = (int) cell.getNumericCellValue();
+		return Integer.valueOf(value);
+	}
+	
+	public int getIntValue(Integer value) {
+		return value.intValue();
 	}
 
 }
