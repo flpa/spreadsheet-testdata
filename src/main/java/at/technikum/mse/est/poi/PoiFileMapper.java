@@ -11,9 +11,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
-public class PoiFileMapper implements FileMapper {
+public class PoiFileMapper implements FileMapper<PoiContext> {
 
-    private Map<Class, TypeMapper> typeMappers;
+    private Map<Class<?>, TypeMapper<?,PoiContext>> typeMappers;
 
     public PoiFileMapper() {
         this.typeMappers = new HashMap<>();
@@ -42,12 +42,12 @@ public class PoiFileMapper implements FileMapper {
         headerStyle.setDataFormat(PoiConstants.EXCEL_CELL_STYLE_DATA_FORMAT_TEXT);
         sheet.createFreezePane(0, 1);
 
-        Context poiContext = new PoiContext(workbook, sheet);
+        PoiContext poiContext = new PoiContext(workbook, sheet);
 
         Field[] fields = clazz.getDeclaredFields();
         FieldLabelBuilder fieldLabelBuilder = new FieldLabelBuilder();
         for (Field field : fields) {
-            TypeMapper typeMapper = typeMappers.get(field.getType());
+            TypeMapper<?, PoiContext> typeMapper = typeMappers.get(field.getType());
             if (typeMapper == null) {
                 throw new TypeMapperNotFoundException(field.getType());
             }
@@ -83,7 +83,7 @@ public class PoiFileMapper implements FileMapper {
         for (int row = 1; row < sheet.getPhysicalNumberOfRows(); row++) {
             for (int i = 0; i < clazz.getDeclaredFields().length; i++) {
             	int currentColumn = hashMap.get(new FieldLabelBuilder().build(fields[i]));
-            	TypeMapper typeMapper = typeMappers.get(fields[i].getType());
+            	TypeMapper<?, PoiContext> typeMapper = typeMappers.get(fields[i].getType());
                 args[i] = typeMapper.readValue(new PoiContext(workbook, sheet), row, currentColumn);
             }
             objectsList.add(newInstance(clazz.getName(), args));
@@ -92,7 +92,7 @@ public class PoiFileMapper implements FileMapper {
 	}
 
     @Override
-    public <S> void registerTypeMapper(TypeMapper typeMapper, Class<S> type) {
+    public <S> void registerTypeMapper(TypeMapper<?,PoiContext> typeMapper, Class<S> type) {
         this.typeMappers.put(type, typeMapper);
     }
     

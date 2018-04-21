@@ -1,9 +1,9 @@
 package at.technikum.mse.est.poi;
 
-import at.technikum.mse.est.Context;
-import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+
+import at.technikum.mse.est.Context;
 
 public class PoiContext implements Context {
 	/*
@@ -13,8 +13,6 @@ public class PoiContext implements Context {
 	 */
 	private final Workbook workbook;
 	private final Sheet sheet;
-	// flpa: not sure if this needs to be here?
-	// private final XSSFDataValidationHelper validationHelper;
 
 	public PoiContext(Workbook workbook, Sheet sheet) {
 		this.workbook = workbook;

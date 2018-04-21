@@ -6,7 +6,7 @@ import at.technikum.mse.est.FieldLabelBuilder;
 
 public class ReflectionExample {
     public static void main(String[] args) {
-        Class testClass = TestClass.class;
+        Class<?> testClass = TestClass.class;
         Field[] fields = testClass.getDeclaredFields();
 
         FieldLabelBuilder fieldLabelBuilder = new FieldLabelBuilder();
