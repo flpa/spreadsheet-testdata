@@ -70,9 +70,9 @@ public class PoiFileMapper implements FileMapper<PoiContext> {
 	}
 
 	@Override
-	public <T> List<T> read(File source, Class<T> clazz, int sheetIndex) throws Exception {
+	public <T> List<T> read(File source, Class<T> clazz) throws Exception {
 		Workbook workbook = WorkbookFactory.create(source);
-		Sheet sheet = workbook.getSheetAt(sheetIndex);
+		Sheet sheet = workbook.getSheet(clazz.getSimpleName());
         ArrayList<T> objectsList = new ArrayList<>(); 
         Field[] fields = clazz.getDeclaredFields();
 
@@ -86,7 +86,7 @@ public class PoiFileMapper implements FileMapper<PoiContext> {
             	TypeMapper<?, PoiContext> typeMapper = typeMappers.get(fields[i].getType());
                 args[i] = typeMapper.readValue(new PoiContext(workbook, sheet), row, currentColumn);
             }
-            objectsList.add(newInstance(clazz.getName(), args));
+            objectsList.add(newInstance(clazz, args));
         }
         return objectsList;
 	}
@@ -96,7 +96,7 @@ public class PoiFileMapper implements FileMapper<PoiContext> {
         this.typeMappers.put(type, typeMapper);
     }
     
-    public HashMap<String, Integer> getExcelFieldNames(Sheet sheet) {
+    private HashMap<String, Integer> getExcelFieldNames(Sheet sheet) {
 
         HashMap<String, Integer> hashMap = new HashMap<>();
 
@@ -108,15 +108,16 @@ public class PoiFileMapper implements FileMapper<PoiContext> {
     }
     
     @SuppressWarnings("unchecked")
-    public static <T> T newInstance(final String className, final Object... args)
-            throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException,
+    private static <T> T newInstance(Class clazz, final Object... args)
+            throws NoSuchMethodException, InstantiationException, IllegalAccessException,
             IllegalArgumentException, InvocationTargetException {
-        @SuppressWarnings("rawtypes")
-        Class[] types = new Class[args.length];
+        Field[] fields = clazz.getDeclaredFields();
+        Class[] types = new Class[fields.length];
         for (int i = 0; i < types.length; i++) {
-            types[i] = args[i].getClass();
+            types[i] = fields[i].getType();
         }
-        return (T)Class.forName(className).getConstructor(types).newInstance(args);
+
+        return (T)clazz.getConstructor(types).newInstance(args);
     }
 
 

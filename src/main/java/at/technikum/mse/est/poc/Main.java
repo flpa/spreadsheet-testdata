@@ -16,7 +16,7 @@ public class Main {
 		LOG.info("Starting");
 		
 		PoiFileMapper fileMapper = new PoiFileMapper();
-        List<Student> list = fileMapper.read(new File("resources/Students.xlsx"), Student.class, 0);
+        List<Student> list = fileMapper.read(new File("resources/Students.xlsx"), Student.class);
         
         for(Student student : list) {
         	System.out.println(student.toString());
