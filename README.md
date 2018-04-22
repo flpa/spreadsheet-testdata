@@ -42,6 +42,12 @@ spreadsheetTestdata.registerFileMapper(new CustomFileMapper());
 ```
 All registered custom type mappers will be removed when registering a new file mapper. 
 
+## Contributions
+Contributions to this open source project are welcome. 
+However, since this library is in an early stage there is no dedicated developer documentation beyond this readme and inline comments.
+
+Our preferred workflow for contributions is forking the project and creating pull requests to offer changes via Github. For more information on this process, please refer to [the Github documentation](https://help.github.com/articles/fork-a-repo/).
+
 ## License
 
 Copyright (c) 2018 Adelina Teofanescu, Florian Patzl, Ralf Rosskopf
