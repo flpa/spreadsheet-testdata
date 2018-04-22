@@ -6,11 +6,6 @@ import org.apache.poi.ss.usermodel.Workbook;
 import at.technikum.mse.est.Context;
 
 public class PoiContext implements Context {
-	/*
-	 * flpa: Having the fields final makes the class immutable, of course we could
-	 * also have them mutable to use one context for the whole process (i.e.
-	 * modifying row while iterating through the rows)
-	 */
 	private final Workbook workbook;
 	private final Sheet sheet;
 
@@ -26,6 +21,4 @@ public class PoiContext implements Context {
 	public Sheet getSheet() {
 		return sheet;
 	}
-
-	
 }
