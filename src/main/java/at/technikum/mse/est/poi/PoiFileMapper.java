@@ -1,6 +1,9 @@
 package at.technikum.mse.est.poi;
 
 import at.technikum.mse.est.*;
+
+import org.apache.poi.EncryptedDocumentException;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -30,7 +33,7 @@ public class PoiFileMapper implements FileMapper<PoiContext> {
 
 
 	@Override
-	public <T> void createTemplate(File target, Class<T> clazz) {
+	public <T> void createTemplate(File target, Class<T> clazz) throws EstException {
 		Workbook workbook = new XSSFWorkbook();
 		Sheet sheet = workbook.createSheet(clazz.getSimpleName());
 
@@ -44,7 +47,7 @@ public class PoiFileMapper implements FileMapper<PoiContext> {
         PoiContext poiContext = new PoiContext(workbook, sheet);
 
         FieldLabelBuilder fieldLabelBuilder = new FieldLabelBuilder();
-        writeClass(clazz, poiContext, fieldLabelBuilder, headerRow, headerStyle, colNumber);
+        writeClass(clazz, poiContext, fieldLabelBuilder, headerRow, headerStyle,"", colNumber, new ArrayDeque<>());
 
 		try (FileOutputStream outputStream = new FileOutputStream(target)) {
 			workbook.write(outputStream);
@@ -54,46 +57,59 @@ public class PoiFileMapper implements FileMapper<PoiContext> {
 		}
 	}
 
-
-	private <T> void writeClass(Class<T> clazz, PoiContext poiContext, FieldLabelBuilder fieldLabelBuilder,
-			Row headerRow, CellStyle headerStyle, int colNumber) {
+	private <T> int writeClass(Class<T> clazz, PoiContext poiContext, FieldLabelBuilder fieldLabelBuilder,
+			Row headerRow, CellStyle headerStyle, String headerPrefix, int colNumber, Deque<Class<?>> classStack) throws CyclicalDependencyException {
+		if(classStack.contains(clazz)) {
+			throw new CyclicalDependencyException("A cyclical dependency has been detected. This is currently not supported.");
+		}
+		classStack.push(clazz);
 		Field[] fields = clazz.getDeclaredFields();
-        for (Field field : fields) {
-            TypeMapper<?, PoiContext> typeMapper = typeMappers.get(field.getType());
-            if (typeMapper == null) {
-                throw new TypeMapperNotFoundException(field.getType());
-            }
-            typeMapper.createColumn(poiContext, colNumber);
+		for (Field field : fields) {
+			TypeMapper<?, PoiContext> typeMapper = typeMappers.get(field.getType());
+			if (typeMapper == null) {
+				colNumber = writeClass(field.getType(), poiContext, fieldLabelBuilder, headerRow, headerStyle, field.getName()
+						+ " ", colNumber, classStack);
+			} else {
+				typeMapper.createColumn(poiContext, colNumber);
 
-            // header
-            Cell headerCell = headerRow.createCell(colNumber);
-            headerCell.setCellStyle(headerStyle);
-            headerCell.setCellValue(fieldLabelBuilder.build(field));
+				// header
+				Cell headerCell = headerRow.createCell(colNumber);
+				headerCell.setCellStyle(headerStyle);
+				headerCell.setCellValue(headerPrefix + fieldLabelBuilder.build(field));
 
-            colNumber++;
-        }
+				colNumber++;
+			}
+		}
+		classStack.pop();
+		return colNumber;
 	}
 
 	@Override
-	public <T> List<T> read(File source, Class<T> clazz) throws Exception {
-		Workbook workbook = WorkbookFactory.create(source);
-		Sheet sheet = workbook.getSheet(clazz.getSimpleName());
-        ArrayList<T> objectsList = new ArrayList<>(); 
-        Field[] fields = clazz.getDeclaredFields();
+	public <T> List<T> read(File source, Class<T> clazz) throws EstException {
+		try (Workbook workbook = WorkbookFactory.create(source)) {
 
-        Object[] args = new Object[fields.length];
+			Sheet sheet = workbook.getSheet(clazz.getSimpleName());
+			ArrayList<T> objectsList = new ArrayList<>();
+			Field[] fields = clazz.getDeclaredFields();
 
-        HashMap<String, Integer> hashMap = getExcelFieldNames(sheet);
+			Object[] args = new Object[fields.length];
 
-        for (int row = 1; row < sheet.getPhysicalNumberOfRows(); row++) {
-            for (int i = 0; i < clazz.getDeclaredFields().length; i++) {
-            	int currentColumn = hashMap.get(new FieldLabelBuilder().build(fields[i]));
-            	TypeMapper<?, PoiContext> typeMapper = typeMappers.get(fields[i].getType());
-                args[i] = typeMapper.readValue(new PoiContext(workbook, sheet), row, currentColumn);
-            }
-            objectsList.add(newInstance(clazz, args));
-        }
-        return objectsList;
+			HashMap<String, Integer> hashMap = getExcelFieldNames(sheet);
+
+			for (int row = 1; row < sheet.getPhysicalNumberOfRows(); row++) {
+				for (int i = 0; i < clazz.getDeclaredFields().length; i++) {
+					int currentColumn = hashMap.get(new FieldLabelBuilder().build(fields[i]));
+					TypeMapper<?, PoiContext> typeMapper = typeMappers.get(fields[i].getType());
+					args[i] = typeMapper.readValue(new PoiContext(workbook, sheet), row, currentColumn);
+				}
+				objectsList.add(newInstance(clazz, args));
+			}
+			return objectsList;
+		} catch (EncryptedDocumentException | InvalidFormatException | IOException e) {
+			throw new EstException("Error while reading workbook", e);
+		} catch (ReflectiveOperationException | IllegalArgumentException e) {
+			throw new EstException("Error while instantiating target class " + clazz);
+		}
 	}
 
     @Override

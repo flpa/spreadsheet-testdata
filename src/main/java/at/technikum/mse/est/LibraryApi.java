@@ -12,7 +12,7 @@ public class LibraryApi {
         this.fileMapper = new PoiFileMapper();
     }
 
-    public <T> void createTemplate(File target, Class<T> clazz) {
+    public <T> void createTemplate(File target, Class<T> clazz) throws EstException {
         fileMapper.createTemplate(target, clazz);
     }
 
