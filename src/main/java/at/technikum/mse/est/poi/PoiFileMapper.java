@@ -99,7 +99,7 @@ public class PoiFileMapper implements FileMapper<PoiContext> {
 		} catch (EncryptedDocumentException | InvalidFormatException | IOException e) {
 			throw new EstException("Error while reading workbook", e);
 		} catch (ReflectiveOperationException | IllegalArgumentException e) {
-			throw new EstException("Error while instantiating target class " + clazz);
+			throw new EstException("Error while instantiating target class " + clazz, e);
 		}
 	}
 
