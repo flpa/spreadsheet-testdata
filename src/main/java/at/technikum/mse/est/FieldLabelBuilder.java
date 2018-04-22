@@ -8,10 +8,10 @@ public class FieldLabelBuilder {
 		if (annotation != null) {
 			return annotation.value();
 		}
-		return capitalizaFirstLetter(f.getName());
+		return capitalizeFirstLetter(f.getName());
 	}
 
-	private String capitalizaFirstLetter(String fieldName) {
+	private String capitalizeFirstLetter(String fieldName) {
 		return fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
 	}
 }
