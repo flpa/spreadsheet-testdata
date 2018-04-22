@@ -7,3 +7,37 @@
 `gradle eclipse`
 
 After running this command the project can be imported into Eclipse.
+
+## Basic Usage
+### Writing a Testdata-Class
+By default a testdata class can only include members of primitive types (except byte) or their corresponding object wrapper classes, as well as Strings. 
+The class must contain a constructor with all members as parameters in the order they are defined as members.
+
+### Generating a Template
+A template file can be generated using the following method:
+```java
+LibraryApi libraryApi = new LibraryApi();
+libraryApi.createTemplate(new File("testdata.xlsx"), TestDataClass.class);
+```
+
+### Reading a Testdata-File
+The contents of a testdata file can be read as a list of testdata objects using the following method:
+```java
+LibraryApi libraryApi = new LibraryApi();
+List<TestDataClass> testData = libraryApi.read(new File("testdata.xlsx"), TestDataClass.class);
+```
+
+### Using Custom Type-Mappers
+If you want to use custom type mappers next to or instead of the built-in default type mappers, you can write a class that implements the `TypeMapper` interface and call the following method before reading or generating a file:
+```java
+libraryApi.registerTypeMapper(new CustomTypeMapper(), CustomMappedClass.class);
+```
+If you use also use a custom file mapper type mappers must be registered after registering the respective file mapper.
+
+### Using Custom File-Mappers
+By default the library uses the built-in `PoiFileMapper` which utilizes Apache Poi to write and read Excel files.
+If you want to use a custom file mapper, you can write a class that implements the interface `FileMapper` and call the following method before reading or generating a file:
+```java
+libraryApi.registerFileMapper(new CustomFileMapper());
+```
+All registered custom type mappers will be removed when registering a new file mapper. 
