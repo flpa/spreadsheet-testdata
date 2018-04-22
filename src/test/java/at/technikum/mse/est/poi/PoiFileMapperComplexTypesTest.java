@@ -4,13 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
-import java.util.Scanner;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -22,33 +19,10 @@ public class PoiFileMapperComplexTypesTest {
 	@Rule
 	public TemporaryFolder tmpFolder = new TemporaryFolder();
 
-	@Ignore
-	@Test
-	public void testFull() throws Exception {
-		File file = tmpFolder.newFile("test.xlsx");
-
-		LibraryApi libraryApi = new LibraryApi();
-		libraryApi.createTemplate(file, ContainerMultipleChildren.class);
-		
-		System.out.println("Wrote " + file.getAbsolutePath());
-
-		System.out.println("Press enter to continue");
-		try (Scanner scanner = new Scanner(System.in)) {
-			scanner.nextLine();
-		}
-
-		List<ContainerMultipleChildren> list = libraryApi.read(file, ContainerMultipleChildren.class);
-
-		System.out.println("before");
-		list.forEach(System.out::println);
-		System.out.println("after");
-	}
-	
 	@Test
 	public void createTemplate_shouldSupportComplexType() throws Exception {
 		File file = tmpFolder.newFile("test.xlsx");
-		LibraryApi libraryApi = new LibraryApi();
-		libraryApi.createTemplate(file, ContainerSingleChild.class);
+		new PoiFileMapper().createTemplate(file, ContainerSingleChild.class);
 		
 		assertThat(countColumns(file)).isEqualTo(2);
 	}
@@ -56,8 +30,7 @@ public class PoiFileMapperComplexTypesTest {
 	@Test
 	public void createTemplate_shouldSupportComplexTypeWithSameChildMultipleTimes() throws Exception {
 		File file = tmpFolder.newFile("test.xlsx");
-		LibraryApi libraryApi = new LibraryApi();
-		libraryApi.createTemplate(file, ContainerMultipleChildren.class);
+		new PoiFileMapper().createTemplate(file, ContainerMultipleChildren.class);
 		
 		assertThat(countColumns(file)).isEqualTo(4);
 	}
@@ -65,8 +38,12 @@ public class PoiFileMapperComplexTypesTest {
 	@Test(expected = CyclicalDependencyException.class)
 	public void createTemplate_shouldPreventStackoverflowForCyclicalDependency() throws Exception {
 		File file = tmpFolder.newFile("test.xlsx");
-		LibraryApi libraryApi = new LibraryApi();
-		libraryApi.createTemplate(file, CyclicalContainer.class);
+		new PoiFileMapper().createTemplate(file, CyclicalContainer.class);
+	}
+	
+	@Test
+	public void read_ShouldSupportComplexTypeWithSameChildMultipleTimes() throws Exception {
+		new  LibraryApi().read(new File("src/test/resources/containerMultipleChildren.xlsx"), ContainerMultipleChildren.class);
 	}
 
 	private int countColumns(File file) throws IOException, InvalidFormatException {

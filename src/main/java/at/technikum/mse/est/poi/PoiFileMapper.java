@@ -92,9 +92,10 @@ public class PoiFileMapper implements FileMapper<PoiContext> {
 
 			HashMap<String, Integer> columnNumberByName = getExcelFieldNames(sheet);
 			FieldLabelBuilder fieldLabelBuilder = new FieldLabelBuilder();
+			PoiContext context = new PoiContext(workbook, sheet);
 
 			for (int row = 1; row < sheet.getPhysicalNumberOfRows(); row++) {
-				objectsList.add(readClass(clazz, workbook, sheet, columnNumberByName, fieldLabelBuilder, row));
+				objectsList.add(readClass(clazz, context, columnNumberByName, fieldLabelBuilder, "", row, new ArrayDeque<>()));
 			}
 			return objectsList;
 		} catch (EncryptedDocumentException | InvalidFormatException | IOException e) {
@@ -104,15 +105,27 @@ public class PoiFileMapper implements FileMapper<PoiContext> {
 		}
 	}
 
-	private <S> S readClass(Class<S> clazz, Workbook workbook, Sheet sheet, HashMap<String, Integer> columnNumberByName,
-			FieldLabelBuilder fieldLabelBuilder, int row) throws ReflectiveOperationException {
+	private <S> S readClass(Class<S> clazz, PoiContext context, HashMap<String, Integer> columnNumberByName,
+			FieldLabelBuilder fieldLabelBuilder, String prefix, int row, Deque<Class<?>> classStack) throws ReflectiveOperationException, CyclicalDependencyException {
+		if(classStack.contains(clazz)) {
+			throw new CyclicalDependencyException("A cyclical dependency has been detected. This is currently not supported.");
+		}
+		classStack.push(clazz);
+		
 		Field[] fields = clazz.getDeclaredFields();
 		Object[] args = new Object[fields.length];
 		for (int i = 0; i < fields.length; i++) {
-			TypeMapper<?, PoiContext> typeMapper = typeMappers.get(fields[i].getType());
-			int currentColumn = columnNumberByName.get(fieldLabelBuilder.build(fields[i]));
-			args[i] = typeMapper.readValue(new PoiContext(workbook, sheet), row, currentColumn);
+			Field field = fields[i];
+			
+			TypeMapper<?, PoiContext> typeMapper = typeMappers.get(field.getType());
+			if (typeMapper == null) {
+				args[i] = readClass(field.getType(), context, columnNumberByName, fieldLabelBuilder, field.getName() + " ", row, classStack);
+			} else {
+				int currentColumn = columnNumberByName.get(prefix + fieldLabelBuilder.build(field));
+				args[i] = typeMapper.readValue(context, row, currentColumn);
+			}
 		}
+		classStack.pop();
 		return newInstance(clazz, args);
 	}
 
@@ -144,6 +157,4 @@ public class PoiFileMapper implements FileMapper<PoiContext> {
 
         return (T)clazz.getConstructor(types).newInstance(args);
     }
-
-
 }
