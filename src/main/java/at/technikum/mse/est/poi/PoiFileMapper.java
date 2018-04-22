@@ -15,7 +15,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 public class PoiFileMapper implements FileMapper<PoiContext> {
-
+	private final FieldLabelBuilder fieldLabelBuilder = new FieldLabelBuilder();
     private Map<Class<?>, TypeMapper<?,PoiContext>> typeMappers;
 
     public PoiFileMapper() {
@@ -45,8 +45,7 @@ public class PoiFileMapper implements FileMapper<PoiContext> {
 
         PoiContext poiContext = new PoiContext(workbook, sheet);
 
-        FieldLabelBuilder fieldLabelBuilder = new FieldLabelBuilder();
-        writeClass(clazz, poiContext, fieldLabelBuilder, headerRow, headerStyle,"", colNumber, new ArrayDeque<>());
+        writeClass(clazz, poiContext, headerRow, headerStyle,"", colNumber, new ArrayDeque<>());
 
 		try (FileOutputStream outputStream = new FileOutputStream(target)) {
 			workbook.write(outputStream);
@@ -56,7 +55,7 @@ public class PoiFileMapper implements FileMapper<PoiContext> {
 		}
 	}
 
-	private <T> int writeClass(Class<T> clazz, PoiContext poiContext, FieldLabelBuilder fieldLabelBuilder,
+	private <T> int writeClass(Class<T> clazz, PoiContext poiContext,
 			Row headerRow, CellStyle headerStyle, String headerPrefix, int colNumber, Deque<Class<?>> classStack) throws CyclicalDependencyException {
 		if(classStack.contains(clazz)) {
 			throw new CyclicalDependencyException("A cyclical dependency has been detected. This is currently not supported.");
@@ -66,8 +65,7 @@ public class PoiFileMapper implements FileMapper<PoiContext> {
 		for (Field field : fields) {
 			TypeMapper<?, PoiContext> typeMapper = typeMappers.get(field.getType());
 			if (typeMapper == null) {
-				colNumber = writeClass(field.getType(), poiContext, fieldLabelBuilder, headerRow, headerStyle, field.getName()
-						+ " ", colNumber, classStack);
+				colNumber = writeClass(field.getType(), poiContext, headerRow, headerStyle, buildFlattenedFieldPrefix(field), colNumber, classStack);
 			} else {
 				typeMapper.createColumn(poiContext, colNumber);
 
@@ -119,7 +117,7 @@ public class PoiFileMapper implements FileMapper<PoiContext> {
 			
 			TypeMapper<?, PoiContext> typeMapper = typeMappers.get(field.getType());
 			if (typeMapper == null) {
-				args[i] = readClass(field.getType(), context, columnNumberByName, fieldLabelBuilder, field.getName() + " ", row, classStack);
+				args[i] = readClass(field.getType(), context, columnNumberByName, fieldLabelBuilder, buildFlattenedFieldPrefix(field), row, classStack);
 			} else {
 				int currentColumn = columnNumberByName.get(prefix + fieldLabelBuilder.build(field));
 				args[i] = typeMapper.readValue(context, row, currentColumn);
@@ -127,6 +125,10 @@ public class PoiFileMapper implements FileMapper<PoiContext> {
 		}
 		classStack.pop();
 		return newInstance(clazz, args);
+	}
+
+	private String buildFlattenedFieldPrefix(Field field) {
+		return fieldLabelBuilder.build(field) + " ";
 	}
 
     @Override
