@@ -15,6 +15,13 @@ repositories {
     mavenCentral()
 }
 
+// To get more test output from Travis
+test {
+    testLogging {
+        exceptionFormat "full" // default is "short"
+    }
+}
+
 dependencies {
     compile 'org.apache.poi:poi:3.17'
     compile 'org.apache.poi:poi-ooxml:3.17'
