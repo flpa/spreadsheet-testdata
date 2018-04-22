@@ -22,13 +22,13 @@ public class PoiFileMapper implements FileMapper<PoiContext> {
         this.typeMappers = new HashMap<>();
 
         registerTypeMapper(new PoiStringTypeMapper(), String.class);
-        registerTypeMapper(new PoiCharacterTypeMapper(), Arrays.asList(Character.class, char.class));
-        registerTypeMapper(new PoiShortTypeMapper(), Arrays.asList(Short.class, short.class));
-        registerTypeMapper(new PoiIntegerTypeMapper(), Arrays.asList(Integer.class, int.class));
-        registerTypeMapper(new PoiLongTypeMapper(), Arrays.asList(Long.class, long.class));
-        registerTypeMapper(new PoiFloatTypeMapper(), Arrays.asList(Float.class, float.class));
-        registerTypeMapper(new PoiDoubleTypeMapper(), Arrays.asList(Double.class, double.class));
-        registerTypeMapper(new PoiBooleanTypeMapper(), Arrays.asList(Boolean.class, boolean.class));
+        registerTypeMapper(new PoiCharacterTypeMapper(), Character.class, char.class);
+        registerTypeMapper(new PoiShortTypeMapper(), Short.class, short.class);
+        registerTypeMapper(new PoiIntegerTypeMapper(), Integer.class, int.class);
+        registerTypeMapper(new PoiLongTypeMapper(), Long.class, long.class);
+        registerTypeMapper(new PoiFloatTypeMapper(), Float.class, float.class);
+        registerTypeMapper(new PoiDoubleTypeMapper(), Double.class, double.class);
+        registerTypeMapper(new PoiBooleanTypeMapper(), Boolean.class, boolean.class);
     }
 
 	@Override
@@ -147,8 +147,10 @@ public class PoiFileMapper implements FileMapper<PoiContext> {
 	}
 
     @Override
-    public <S> void registerTypeMapper(TypeMapper<?,PoiContext> typeMapper, Class<S> type) {
-        this.typeMappers.put(type, typeMapper);
+    public <S> void registerTypeMapper(TypeMapper<?,PoiContext> typeMapper, Class<S>... types) {
+    	for (int i = 0; i < types.length; i++) {
+    		this.typeMappers.put(types[i], typeMapper);
+		}
     }
     
     private HashMap<String, Integer> getExcelFieldNames(Sheet sheet) {

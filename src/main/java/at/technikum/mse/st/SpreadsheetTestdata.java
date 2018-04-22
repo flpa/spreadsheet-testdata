@@ -24,11 +24,7 @@ public class SpreadsheetTestdata {
         this.fileMapper = fileMapper;
     }
 
-    public <S> void registerTypeMapper(TypeMapper typeMapper, Class<S> type) {
-        fileMapper.registerTypeMapper(typeMapper, type);
-    }
-
-    public <S> void registerTypeMapper(TypeMapper typeMapper, List<Class<S>> types) {
+    public <S> void registerTypeMapper(TypeMapper typeMapper, Class<S>... types) {
         fileMapper.registerTypeMapper(typeMapper, types);
     }
 }

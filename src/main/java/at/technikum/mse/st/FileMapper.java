@@ -8,9 +8,5 @@ public interface FileMapper<C extends Context> {
 
 	<T> List<T> read(File source, Class<T> clazz) throws StException;
 
-	<S> void registerTypeMapper(TypeMapper<?, C> typeMapper, Class<S> type);
-
-	default <S> void registerTypeMapper(TypeMapper<?, C> typeMapper, List<Class<S>> types) {
-		types.forEach(type -> registerTypeMapper(typeMapper, type));
-	}
+	<S> void registerTypeMapper(TypeMapper<?, C> typeMapper, Class<S>... types);
 }

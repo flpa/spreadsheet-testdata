@@ -1,6 +1,7 @@
 package at.technikum.mse.st.poi;
 
 import at.technikum.mse.st.Flatten;
+
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
@@ -52,6 +53,7 @@ public class PoiFileMapperComplexTypesTest {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	static class ContainerSingleChild {
 		private final String name;
 		@Flatten
@@ -61,16 +63,9 @@ public class PoiFileMapperComplexTypesTest {
 			this.name = name;
 			this.child = child;
 		}
-
-		public String getName() {
-			return name;
-		}
-
-		public Child getChild() {
-			return child;
-		}
 	}
 
+	@SuppressWarnings("unused")
 	static class ContainerMultipleChildren {
 		private final String name;
 		@Flatten
@@ -86,45 +81,23 @@ public class PoiFileMapperComplexTypesTest {
 			this.child2 = child2;
 			this.anotherRelation = anotherRelation;
 		}
-
-		public String getName() {
-			return name;
-		}
-
-		public Child getChild11() {
-			return child1;
-		}
-
-		public Child getChild12() {
-			return child2;
-		}
-
-		public AnotherRelation getChild2() {
-			return anotherRelation;
-		}
 	}
 
+	@SuppressWarnings("unused")
 	static class Child {
 		private final String name;
 
 		public Child(String name) {
 			this.name = name;
 		}
-
-		public String getName() {
-			return name;
-		}
 	}
 
+	@SuppressWarnings("unused")
 	static class AnotherRelation {
 		private final int length;
 
 		public AnotherRelation(int length) {
 			this.length = length;
-		}
-
-		public int getLength() {
-			return length;
 		}
 	}
 
@@ -134,10 +107,6 @@ public class PoiFileMapperComplexTypesTest {
 
 		public CyclicalContainer(CyclicalContainer cycle) {
 			this.cycle = cycle;
-		}
-
-		public CyclicalContainer getCycle() {
-			return cycle;
 		}
 	}
 }
