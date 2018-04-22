@@ -1,18 +1,18 @@
 language: java
-sudo: false
-install: true
-addons:
-  sonarcloud:
-    organization: "flpa-github"
-    token:
-      secure: "TXgwS1ZWbSsTZIvWW3s0JfPT+DWt+YhmdGYehJCosQv/fFYvT4yUynPYklgyy0Bx/ZT8qJuoDnC5AuQ9QSxmmoJdMF1+ax97n4RW1s/8Qihp9zofwR0MYuWPA2RdjEMjfGo9PH0kePM8EiVyfBAOVIlXo8MPiHslzEyjhhGK/yfamRf3Kyjw3xT5OtW7TF3dCaobLvJIe2KUJvfxR7bd+y7jmn8WUa9iqYlOqnEIDxvaEpuDq/tC5XEGNk6aK8Kw+eJ7r7Zpm7qc8tTXDJv4a0lomNSE4liWwMaZ+nPaV276q4hSs86LlWIO7HpN+adhyumYAoWAOhuP537ahxoFeZM039xdznHrMupQTbnP6y0pZKWhpmweivFu9OUbvG58XfucrCTaBgva690EUs53cTehZ9hmE9BOF9Sd8mk9i6vBOHF7q++qUDwe51BxoxyLNUOFf5Rb/5p5Qlou072gyOtaaJCu0X08ikczj0rKmfVTCBhbb6bFWIJX6RTNwMGKr0NX3Gq44e3ghCaUJr6TtiemQkBaj9nDc1JLOZipmVKYN90PRyg0KdlVRQfygG/6DxnN6iIHXSqrrfa40nf8RCBzz4IlVQKPeDV/4e0hkkRb5yCmBXDMYvBwdcM7XKZjVcZque7L1ofTXvENwGPOFgSkFu95IGjhNoe+OXGMvzk="
-jdk:
-  - oraclejdk8
-script:
-  - ./gradlew sonarqube
-cache:
-  directories:
-    - '$HOME/.m2/repository'
-    - '$HOME/.sonar/cache'
-    - '$HOME/.gradle'
-    - '.gradle'
+# sudo: false
+# install: true
+# addons:
+#   sonarcloud:
+#     organization: "flpa-github"
+#     token:
+#       secure: "TXgwS1ZWbSsTZIvWW3s0JfPT+DWt+YhmdGYehJCosQv/fFYvT4yUynPYklgyy0Bx/ZT8qJuoDnC5AuQ9QSxmmoJdMF1+ax97n4RW1s/8Qihp9zofwR0MYuWPA2RdjEMjfGo9PH0kePM8EiVyfBAOVIlXo8MPiHslzEyjhhGK/yfamRf3Kyjw3xT5OtW7TF3dCaobLvJIe2KUJvfxR7bd+y7jmn8WUa9iqYlOqnEIDxvaEpuDq/tC5XEGNk6aK8Kw+eJ7r7Zpm7qc8tTXDJv4a0lomNSE4liWwMaZ+nPaV276q4hSs86LlWIO7HpN+adhyumYAoWAOhuP537ahxoFeZM039xdznHrMupQTbnP6y0pZKWhpmweivFu9OUbvG58XfucrCTaBgva690EUs53cTehZ9hmE9BOF9Sd8mk9i6vBOHF7q++qUDwe51BxoxyLNUOFf5Rb/5p5Qlou072gyOtaaJCu0X08ikczj0rKmfVTCBhbb6bFWIJX6RTNwMGKr0NX3Gq44e3ghCaUJr6TtiemQkBaj9nDc1JLOZipmVKYN90PRyg0KdlVRQfygG/6DxnN6iIHXSqrrfa40nf8RCBzz4IlVQKPeDV/4e0hkkRb5yCmBXDMYvBwdcM7XKZjVcZque7L1ofTXvENwGPOFgSkFu95IGjhNoe+OXGMvzk="
+# jdk:
+#   - oraclejdk8
+# script:
+#   - ./gradlew sonarqube
+# cache:
+#   directories:
+#     - '$HOME/.m2/repository'
+#     - '$HOME/.sonar/cache'
+#     - '$HOME/.gradle'
+#     - '.gradle'
