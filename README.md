@@ -41,3 +41,17 @@ If you want to use a custom file mapper, you can write a class that implements t
 libraryApi.registerFileMapper(new CustomFileMapper());
 ```
 All registered custom type mappers will be removed when registering a new file mapper. 
+
+## License
+
+Copyright (c) 2018 Adelina Teofanescu, Florian Patzl, Ralf Rosskopf
+published under the MIT license
+
+This library uses the following software from other open source projects:
+- Apache POI 3.17, Copyright (c) The Apache Software Foundation  
+  license: The Apache Software License, Version 2.0
+- SLF4J, Copyright (c) QOS.ch
+  license: The MIT License
+  sources: https://www.slf4j.org/download.html
+
+Copies of all licenses can be found in this file's directory.
