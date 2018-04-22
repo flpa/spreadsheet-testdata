@@ -51,7 +51,7 @@ public class PoiFileMapper implements FileMapper<PoiContext> {
 			workbook.write(outputStream);
 			workbook.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new StException("Error while writing workbook", e);
 		}
 	}
 
