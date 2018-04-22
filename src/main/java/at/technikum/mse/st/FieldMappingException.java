@@ -1,6 +1,4 @@
-package at.technikum.mse.st.poi;
-
-import at.technikum.mse.st.StException;
+package at.technikum.mse.st;
 
 import java.lang.reflect.Field;
 

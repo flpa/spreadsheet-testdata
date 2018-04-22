@@ -1,5 +1,6 @@
 package at.technikum.mse.st.poi;
 
+import at.technikum.mse.st.CyclicalDependencyException;
 import at.technikum.mse.st.Flatten;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;

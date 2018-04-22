@@ -45,7 +45,7 @@ public class PoiFileMapper implements FileMapper<PoiContext> {
 
         PoiContext poiContext = new PoiContext(workbook, sheet);
 
-        writeClass(clazz, poiContext, headerRow, headerStyle,"", colNumber, new ArrayDeque<>());
+        writeClass(clazz, poiContext, headerRow, headerStyle,"", colNumber, new ArrayDeque<>(), new HashSet<>());
 
 		try (FileOutputStream outputStream = new FileOutputStream(target)) {
 			workbook.write(outputStream);
@@ -56,7 +56,7 @@ public class PoiFileMapper implements FileMapper<PoiContext> {
 	}
 
 	private <T> int writeClass(Class<T> clazz, PoiContext poiContext,
-			Row headerRow, CellStyle headerStyle, String headerPrefix, int colNumber, Deque<Class<?>> classStack) throws CyclicalDependencyException, FieldMappingException {
+			Row headerRow, CellStyle headerStyle, String headerPrefix, int colNumber, Deque<Class<?>> classStack, Set<String> labels) throws CyclicalDependencyException, FieldMappingException, DuplicateLabelException {
 		if(classStack.contains(clazz)) {
 			throw new CyclicalDependencyException("A cyclical dependency has been detected. This is currently not supported.");
 		}
@@ -68,13 +68,18 @@ public class PoiFileMapper implements FileMapper<PoiContext> {
 				typeMapper.createColumn(poiContext, colNumber);
 
 				// header
+                String label = headerPrefix + fieldLabelBuilder.build(field);
+                if (labels.contains(label)) {
+                    throw new DuplicateLabelException(field, label);
+                }
+                labels.add(label);
 				Cell headerCell = headerRow.createCell(colNumber);
 				headerCell.setCellStyle(headerStyle);
-				headerCell.setCellValue(headerPrefix + fieldLabelBuilder.build(field));
+				headerCell.setCellValue(label);
 
 				colNumber++;
 			} else if (field.getAnnotation(Flatten.class) != null) {
-				colNumber = writeClass(field.getType(), poiContext, headerRow, headerStyle, buildFlattenedFieldPrefix(field), colNumber, classStack);
+				colNumber = writeClass(field.getType(), poiContext, headerRow, headerStyle, buildFlattenedFieldPrefix(field), colNumber, classStack, labels);
 			} else {
 				throw new FieldMappingException(field);
 			}
