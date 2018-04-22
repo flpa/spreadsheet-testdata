@@ -61,7 +61,7 @@ public class PoiFileMapper implements FileMapper<PoiContext> {
 			throw new CyclicalDependencyException("A cyclical dependency has been detected. This is currently not supported.");
 		}
 		classStack.push(clazz);
-		Field[] fields = clazz.getDeclaredFields();
+		Field[] fields = getClassFields(clazz);
 		for (Field field : fields) {
 			TypeMapper<?, PoiContext> typeMapper = typeMappers.get(field.getType());
 			if (typeMapper != null) {
@@ -81,6 +81,17 @@ public class PoiFileMapper implements FileMapper<PoiContext> {
 		}
 		classStack.pop();
 		return colNumber;
+	}
+
+	private <T> Field[] getClassFields(Class<T> clazz) {
+		/*
+		 * Jacoco Code Coverage injects these fields into our test classes but
+		 * we do not have TypeMappers for them and they are not in the
+		 * constructors
+		 */
+		return Arrays.stream(clazz.getDeclaredFields())
+				.filter(field -> field.getName().equalsIgnoreCase("$jacocoData") == false)//
+				.toArray(Field[]::new);
 	}
 
 	@Override
@@ -112,7 +123,7 @@ public class PoiFileMapper implements FileMapper<PoiContext> {
 		}
 		classStack.push(clazz);
 		
-		Field[] fields = clazz.getDeclaredFields();
+		Field[] fields = getClassFields(clazz);
 		Object[] args = new Object[fields.length];
 		for (int i = 0; i < fields.length; i++) {
 			Field field = fields[i];
@@ -152,10 +163,10 @@ public class PoiFileMapper implements FileMapper<PoiContext> {
     }
     
     @SuppressWarnings("unchecked")
-    private static <T> T newInstance(Class clazz, final Object... args)
+    private <T> T newInstance(Class clazz, final Object... args)
             throws NoSuchMethodException, InstantiationException, IllegalAccessException,
             IllegalArgumentException, InvocationTargetException {
-        Field[] fields = clazz.getDeclaredFields();
+        Field[] fields = getClassFields(clazz);
         Class[] types = new Class[fields.length];
         for (int i = 0; i < types.length; i++) {
             types[i] = fields[i].getType();
