@@ -35,8 +35,7 @@ public class PoiFileMapper implements FileMapper<PoiContext> {
 		Sheet sheet = workbook.createSheet(clazz.getSimpleName());
 
         // header
-        Row row = sheet.createRow(0);
-        Cell cell;
+        Row headerRow = sheet.createRow(0);
         int colNumber = 0;
         CellStyle headerStyle = workbook.createCellStyle();
         headerStyle.setDataFormat(PoiConstants.EXCEL_CELL_STYLE_DATA_FORMAT_TEXT);
@@ -44,8 +43,21 @@ public class PoiFileMapper implements FileMapper<PoiContext> {
 
         PoiContext poiContext = new PoiContext(workbook, sheet);
 
-        Field[] fields = clazz.getDeclaredFields();
         FieldLabelBuilder fieldLabelBuilder = new FieldLabelBuilder();
+        writeClass(clazz, poiContext, fieldLabelBuilder, headerRow, headerStyle, colNumber);
+
+		try (FileOutputStream outputStream = new FileOutputStream(target)) {
+			workbook.write(outputStream);
+			workbook.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+
+	private <T> void writeClass(Class<T> clazz, PoiContext poiContext, FieldLabelBuilder fieldLabelBuilder,
+			Row headerRow, CellStyle headerStyle, int colNumber) {
+		Field[] fields = clazz.getDeclaredFields();
         for (Field field : fields) {
             TypeMapper<?, PoiContext> typeMapper = typeMappers.get(field.getType());
             if (typeMapper == null) {
@@ -54,19 +66,12 @@ public class PoiFileMapper implements FileMapper<PoiContext> {
             typeMapper.createColumn(poiContext, colNumber);
 
             // header
-            cell = row.createCell(colNumber);
-            cell.setCellStyle(headerStyle);
-            cell.setCellValue(fieldLabelBuilder.build(field));
+            Cell headerCell = headerRow.createCell(colNumber);
+            headerCell.setCellStyle(headerStyle);
+            headerCell.setCellValue(fieldLabelBuilder.build(field));
 
             colNumber++;
         }
-
-		try (FileOutputStream outputStream = new FileOutputStream(target)) {
-			workbook.write(outputStream);
-			workbook.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 	@Override
