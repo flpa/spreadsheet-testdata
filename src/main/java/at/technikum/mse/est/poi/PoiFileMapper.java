@@ -31,7 +31,6 @@ public class PoiFileMapper implements FileMapper<PoiContext> {
         registerTypeMapper(new PoiBooleanTypeMapper(), Arrays.asList(Boolean.class, boolean.class));
     }
 
-
 	@Override
 	public <T> void createTemplate(File target, Class<T> clazz) throws EstException {
 		Workbook workbook = new XSSFWorkbook();
@@ -90,19 +89,12 @@ public class PoiFileMapper implements FileMapper<PoiContext> {
 
 			Sheet sheet = workbook.getSheet(clazz.getSimpleName());
 			ArrayList<T> objectsList = new ArrayList<>();
-			Field[] fields = clazz.getDeclaredFields();
 
-			Object[] args = new Object[fields.length];
-
-			HashMap<String, Integer> hashMap = getExcelFieldNames(sheet);
+			HashMap<String, Integer> columnNumberByName = getExcelFieldNames(sheet);
+			FieldLabelBuilder fieldLabelBuilder = new FieldLabelBuilder();
 
 			for (int row = 1; row < sheet.getPhysicalNumberOfRows(); row++) {
-				for (int i = 0; i < clazz.getDeclaredFields().length; i++) {
-					int currentColumn = hashMap.get(new FieldLabelBuilder().build(fields[i]));
-					TypeMapper<?, PoiContext> typeMapper = typeMappers.get(fields[i].getType());
-					args[i] = typeMapper.readValue(new PoiContext(workbook, sheet), row, currentColumn);
-				}
-				objectsList.add(newInstance(clazz, args));
+				objectsList.add(readClass(clazz, workbook, sheet, columnNumberByName, fieldLabelBuilder, row));
 			}
 			return objectsList;
 		} catch (EncryptedDocumentException | InvalidFormatException | IOException e) {
@@ -110,6 +102,18 @@ public class PoiFileMapper implements FileMapper<PoiContext> {
 		} catch (ReflectiveOperationException | IllegalArgumentException e) {
 			throw new EstException("Error while instantiating target class " + clazz);
 		}
+	}
+
+	private <S> S readClass(Class<S> clazz, Workbook workbook, Sheet sheet, HashMap<String, Integer> columnNumberByName,
+			FieldLabelBuilder fieldLabelBuilder, int row) throws ReflectiveOperationException {
+		Field[] fields = clazz.getDeclaredFields();
+		Object[] args = new Object[fields.length];
+		for (int i = 0; i < fields.length; i++) {
+			TypeMapper<?, PoiContext> typeMapper = typeMappers.get(fields[i].getType());
+			int currentColumn = columnNumberByName.get(fieldLabelBuilder.build(fields[i]));
+			args[i] = typeMapper.readValue(new PoiContext(workbook, sheet), row, currentColumn);
+		}
+		return newInstance(clazz, args);
 	}
 
     @Override
