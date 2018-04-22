@@ -1,10 +1,6 @@
 package at.technikum.mse.est.poi;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.io.File;
-import java.io.IOException;
-
+import at.technikum.mse.est.Flatten;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
@@ -12,7 +8,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import at.technikum.mse.est.LibraryApi;
+import java.io.File;
+import java.io.IOException;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class PoiFileMapperComplexTypesTest {
 
@@ -55,6 +54,7 @@ public class PoiFileMapperComplexTypesTest {
 
 	static class ContainerSingleChild {
 		private final String name;
+		@Flatten
 		private final Child child;
 
 		public ContainerSingleChild(String name, Child child) {
@@ -73,8 +73,11 @@ public class PoiFileMapperComplexTypesTest {
 
 	static class ContainerMultipleChildren {
 		private final String name;
+		@Flatten
 		private final Child child1;
+		@Flatten
 		private final Child child2;
+		@Flatten
 		private final AnotherRelation anotherRelation;
 
 		public ContainerMultipleChildren(String name, Child child1, Child child2, AnotherRelation anotherRelation) {
@@ -126,6 +129,7 @@ public class PoiFileMapperComplexTypesTest {
 	}
 
 	static class CyclicalContainer {
+		@Flatten
 		private final CyclicalContainer cycle;
 
 		public CyclicalContainer(CyclicalContainer cycle) {
