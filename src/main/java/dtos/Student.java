@@ -1,6 +1,6 @@
 package dtos;
 
-import at.technikum.mse.est.Label;
+import at.technikum.mse.st.Label;
 
 public class Student {
 	
