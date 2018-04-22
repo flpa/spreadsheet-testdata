@@ -23,39 +23,40 @@ public class PoiFileMapperComplexTypesTest {
 	public void createTemplate_shouldSupportComplexType() throws Exception {
 		File file = tmpFolder.newFile("test.xlsx");
 		new PoiFileMapper().createTemplate(file, ContainerSingleChild.class);
-		
+
 		assertThat(countColumns(file)).isEqualTo(2);
 	}
-	
+
 	@Test
 	public void createTemplate_shouldSupportComplexTypeWithSameChildMultipleTimes() throws Exception {
 		File file = tmpFolder.newFile("test.xlsx");
 		new PoiFileMapper().createTemplate(file, ContainerMultipleChildren.class);
-		
+
 		assertThat(countColumns(file)).isEqualTo(4);
 	}
-	
+
 	@Test(expected = CyclicalDependencyException.class)
 	public void createTemplate_shouldPreventStackoverflowForCyclicalDependency() throws Exception {
 		File file = tmpFolder.newFile("test.xlsx");
 		new PoiFileMapper().createTemplate(file, CyclicalContainer.class);
 	}
-	
+
 	@Test
 	public void read_ShouldSupportComplexTypeWithSameChildMultipleTimes() throws Exception {
-		new  LibraryApi().read(new File("src/test/resources/containerMultipleChildren.xlsx"), ContainerMultipleChildren.class);
+		new PoiFileMapper().read(new File(getClass().getClassLoader().getResource("containerMultipleChildren.xlsx")
+				.toURI()), ContainerMultipleChildren.class);
 	}
 
 	private int countColumns(File file) throws IOException, InvalidFormatException {
-		try(Workbook workbook = WorkbookFactory.create(file)) {
+		try (Workbook workbook = WorkbookFactory.create(file)) {
 			return workbook.getSheetAt(0).getRow(0).getLastCellNum();
 		}
 	}
-	
+
 	static class ContainerSingleChild {
 		private final String name;
 		private final Child child;
-		
+
 		public ContainerSingleChild(String name, Child child) {
 			this.name = name;
 			this.child = child;
@@ -123,7 +124,7 @@ public class PoiFileMapperComplexTypesTest {
 			return length;
 		}
 	}
-	
+
 	static class CyclicalContainer {
 		private final CyclicalContainer cycle;
 
