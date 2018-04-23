@@ -77,9 +77,11 @@ public class PoiFileMapper implements FileMapper<PoiContext> {
 		Field[] fields = getClassFields(clazz);
 		for (Field field : fields) {
 			TypeMapper<?, PoiContext> typeMapper = typeMappers.get(field.getType());
-			LOG.info("For the field " + field.getName() + " using " + typeMapper.getClass().getSimpleName());
+			
 			if (typeMapper != null) {
+				LOG.info("For the field " + field.getName() + " using " + typeMapper.getClass().getSimpleName());
 				typeMapper.createColumn(poiContext, colNumber);
+				
 				
 				// header
                 String label = headerPrefix + fieldLabelBuilder.build(field);
