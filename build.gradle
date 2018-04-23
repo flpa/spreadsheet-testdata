@@ -19,7 +19,6 @@ apply plugin: 'eclipse'
 apply plugin: "net.researchgate.release"
 
 group 'at.technikum.mse.swf'
-version '1.0-SNAPSHOT'
 
 sourceCompatibility = 1.8
 
@@ -46,29 +45,20 @@ dependencies {
     testCompile "org.mockito:mockito-core:2.+" 
 }
 
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
 
-// include license and README in distribution package
-// distZip {
-//     into(project.name + "-" + version) {
-//         from '.'
-//         include 'LICENSE.txt'
-//         include 'LICENSE-3RD-PARTY.txt'
-//     }
-// 
-//     // README.md is renamed to README.txt and Images are filtered
-//     into(project.name + "-" + version) {
-//     	from '.'
-//     	include 'README.md'
-// 
-//     	filter { String line ->
-// 	    line.replaceAll('!?\\[.*\\]\\(.*\\)', '')
-//     	}
-// 
-//     	rename { String fileName ->
-//     	    fileName.replace('.md', '.txt')
-//     	}
-//     }
-// }
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
 
 //set shorter automated release commit msgs
 release {
