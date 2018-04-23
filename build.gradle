@@ -1,3 +1,14 @@
+buildscript {
+  repositories {
+    maven {
+      url "https://plugins.gradle.org/m2/"
+    }
+  }
+  dependencies {
+    classpath "net.researchgate:gradle-release:2.3.5"
+  }
+}
+
 plugins {
   id "org.sonarqube" version "2.6"
 }
@@ -35,39 +46,29 @@ dependencies {
     testCompile "org.mockito:mockito-core:2.+" 
 }
 
-buildscript {
-  repositories {
-    maven {
-      url "https://plugins.gradle.org/m2/"
-    }
-  }
-  dependencies {
-    classpath "net.researchgate:gradle-release:2.3.5"
-  }
-}
 
 // include license and README in distribution package
-distZip {
-    into(project.name + "-" + version) {
-        from '.'
-        include 'LICENSE.txt'
-        include 'LICENSE-3RD-PARTY.txt'
-    }
-
-    // README.md is renamed to README.txt and Images are filtered
-    into(project.name + "-" + version) {
-    	from '.'
-    	include 'README.md'
-
-    	filter { String line ->
-	    line.replaceAll('!?\\[.*\\]\\(.*\\)', '')
-    	}
-
-    	rename { String fileName ->
-    	    fileName.replace('.md', '.txt')
-    	}
-    }
-}
+// distZip {
+//     into(project.name + "-" + version) {
+//         from '.'
+//         include 'LICENSE.txt'
+//         include 'LICENSE-3RD-PARTY.txt'
+//     }
+// 
+//     // README.md is renamed to README.txt and Images are filtered
+//     into(project.name + "-" + version) {
+//     	from '.'
+//     	include 'README.md'
+// 
+//     	filter { String line ->
+// 	    line.replaceAll('!?\\[.*\\]\\(.*\\)', '')
+//     	}
+// 
+//     	rename { String fileName ->
+//     	    fileName.replace('.md', '.txt')
+//     	}
+//     }
+// }
 
 //set shorter automated release commit msgs
 release {
