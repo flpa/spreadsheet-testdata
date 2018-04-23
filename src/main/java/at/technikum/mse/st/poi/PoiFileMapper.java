@@ -6,6 +6,8 @@ import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -15,12 +17,17 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 public class PoiFileMapper implements FileMapper<PoiContext> {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(PoiFileMapper.class);
+	
 	private final FieldLabelBuilder fieldLabelBuilder = new FieldLabelBuilder();
     private Map<Class<?>, TypeMapper<?,PoiContext>> typeMappers;
 
     public PoiFileMapper() {
         this.typeMappers = new HashMap<>();
-
+        
+        LOG.info("Registering the TypeMappers...");
+        
         registerTypeMapper(new PoiStringTypeMapper(), String.class);
         registerTypeMapper(new PoiCharacterTypeMapper(), Character.class, char.class);
         registerTypeMapper(new PoiShortTypeMapper(), Short.class, short.class);
@@ -33,8 +40,11 @@ public class PoiFileMapper implements FileMapper<PoiContext> {
 
 	@Override
 	public <T> void createTemplate(File target, Class<T> clazz) throws StException {
+		LOG.info("Start creating the template...");
 		Workbook workbook = new XSSFWorkbook();
+		
 		Sheet sheet = workbook.createSheet(clazz.getSimpleName());
+		LOG.info("Sheet " + clazz.getSimpleName() + " created ");
 
         // header
         Row headerRow = sheet.createRow(0);
@@ -53,6 +63,8 @@ public class PoiFileMapper implements FileMapper<PoiContext> {
 		} catch (IOException e) {
 			throw new StException("Error while writing workbook", e);
 		}
+		
+		LOG.info("Template for " + clazz.getSimpleName() + " created");
 	}
 
 	private <T> int writeClass(Class<T> clazz, PoiContext poiContext,
@@ -61,12 +73,14 @@ public class PoiFileMapper implements FileMapper<PoiContext> {
 			throw new CyclicalDependencyException("A cyclical dependency has been detected. This is currently not supported.");
 		}
 		classStack.push(clazz);
+		LOG.info("Getting the fields for " + clazz.getSimpleName());
 		Field[] fields = getClassFields(clazz);
 		for (Field field : fields) {
 			TypeMapper<?, PoiContext> typeMapper = typeMappers.get(field.getType());
+			LOG.info("For the field " + field.getName() + " using " + typeMapper.getClass().getSimpleName());
 			if (typeMapper != null) {
 				typeMapper.createColumn(poiContext, colNumber);
-
+				
 				// header
                 String label = headerPrefix + fieldLabelBuilder.build(field);
                 if (labels.contains(label)) {
@@ -77,6 +91,8 @@ public class PoiFileMapper implements FileMapper<PoiContext> {
 				headerCell.setCellStyle(headerStyle);
 				headerCell.setCellValue(label);
 
+				LOG.info("Header " + label + " for column " + colNumber + " created");
+				
 				colNumber++;
 			} else if (field.getAnnotation(Flatten.class) != null) {
 				colNumber = writeClass(field.getType(), poiContext, headerRow, headerStyle, buildFlattenedFieldPrefix(field), colNumber, classStack, labels);
@@ -95,7 +111,7 @@ public class PoiFileMapper implements FileMapper<PoiContext> {
 		 * constructors
 		 */
 		return Arrays.stream(clazz.getDeclaredFields())
-				.filter(field -> field.getName().equalsIgnoreCase("$jacocoData") == false)//
+				.filter(field -> !field.getName().equalsIgnoreCase("$jacocoData"))//
 				.toArray(Field[]::new);
 	}
 

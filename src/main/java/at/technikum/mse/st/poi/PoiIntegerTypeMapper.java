@@ -8,8 +8,12 @@ import org.apache.poi.ss.usermodel.DataValidation;
 import org.apache.poi.ss.usermodel.DataValidationConstraint;
 import org.apache.poi.ss.usermodel.DataValidationHelper;
 import org.apache.poi.ss.util.CellRangeAddressList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PoiIntegerTypeMapper implements TypeMapper<Integer, PoiContext> {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(PoiIntegerTypeMapper.class);
 
 	@Override
 	public void createColumn(PoiContext context, int index) {
@@ -32,6 +36,8 @@ public class PoiIntegerTypeMapper implements TypeMapper<Integer, PoiContext> {
 		validation.setShowErrorBox(true);
 
 		context.getSheet().addValidationData(validation);
+		LOG.info("Validation: " + validation.getErrorBoxText() + "! for column " + index + " created");
+		LOG.info("Column " + index + " created");
 	}
 
 	@Override
