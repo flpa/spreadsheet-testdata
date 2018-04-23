@@ -7,12 +7,6 @@ Spreadsheet Testdata is a library that can generate template spreadsheet files f
 
 By default Spreadsheet Testdata supports Excel files by utilizing Apache POI.
 
-## Initialize for Development
- 
-`gradle eclipse`
-
-After running this command the project can be imported into Eclipse.
-
 ## Basic Usage
 ### Writing a Testdata-Class
 By default a testdata class can include members of primitive types (except byte) or their corresponding object wrapper classes, as well as Strings. 
@@ -53,11 +47,38 @@ spreadsheetTestdata.registerFileMapper(new CustomFileMapper());
 ```
 All registered custom type mappers will be removed when registering a new file mapper. 
 
-## Contributions
+## Getting Spreadsheet Testdata
+The preferred way of obtaining our library is [https://jitpack.io/](jitpack).
+Jitpack allows you to include Spreadsheet Testdata in any project using the Maven or Gradle build systems.
+For example, a Maven project can depend on Spreadsheet Testdata like this:
+```xml
+	<repositories>
+		<repository>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
+		</repository>
+	</repositories>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.github.flpa</groupId>
+			<artifactId>spreadsheet-testdata</artifactId>
+			<version>v1.0.0-RC1.1</version>
+		</dependency>
+	</dependencies>
+```
+
+## Development and Contributions
 Contributions to this open source project are welcome. 
 However, since this library is in an early stage there is no dedicated developer documentation beyond this readme and inline comments.
 
 Our preferred workflow for contributions is forking the project and creating pull requests to offer changes via Github. For more information on this process, please refer to [the Github documentation](https://help.github.com/articles/fork-a-repo/).
+
+### Initialize for Development 
+`gradle eclipse`
+
+After running this command the project can be imported into Eclipse.
+
 
 ## License
 
