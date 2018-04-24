@@ -1,5 +1,5 @@
 # Spreadsheet Testdata
-[![Build Status](https://travis-ci.org/flpa/swf.svg?branch=master)](https://travis-ci.org/flpa/swf)
+[![Build Status](https://travis-ci.org/flpa/spreadsheet-testdata.svg?branch=master)](https://travis-ci.org/flpa/spreadsheet-testdata)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=at.technikum.mse.swf%3ASpreadsheetTestdata&metric=alert_status)](https://sonarcloud.io/dashboard?id=at.technikum.mse.swf%3ASpreadsheetTestdata) [![Maintainability](https://sonarcloud.io/api/project_badges/measure?project=at.technikum.mse.swf%3ASpreadsheetTestdata&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=at.technikum.mse.swf%3ASpreadsheetTestdata)  
 
 ## About this Project
